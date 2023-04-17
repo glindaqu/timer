@@ -5,28 +5,31 @@ using UnityEngine.UI;
 
 public class ItemController : MonoBehaviour, IDragHandler
 {
-    private Camera camera;
+    private Camera cam;
     private int waitFor = 0;
     private bool isPaused = false;
     private Button btn;
+    [SerializeField] private Text time;
+    [SerializeField] private Text title;
 
     private void Awake()
     {
-        camera = Camera.main;
+        cam = Camera.main;
         btn = GetComponentInChildren<Button>();
     }
 
     public void OnDrag(PointerEventData e)
     {
-        var pos = camera.ScreenToWorldPoint(Input.mousePosition);
+        var pos = cam.ScreenToWorldPoint(Input.mousePosition);
         transform.position = new Vector2(pos.x, pos.y);
+        ItemDeleter.ToDelete = this.gameObject;
     }
 
     public void SetInterval(int interval, string ti)
     {
         this.waitFor = interval;
         StartCoroutine(TickUpdate());
-        GetComponentsInChildren<Text>()[3].text = ti;
+        title.text = ti;
     }
 
     private IEnumerator Tick()
@@ -51,7 +54,7 @@ public class ItemController : MonoBehaviour, IDragHandler
         int min = this.waitFor / 60;
         string s = (this.waitFor % 60).ToString().Length == 1 ? "0" + (this.waitFor % 60) : (this.waitFor % 60).ToString();
 
-        GetComponent<InputField>().text = $"{min}:{s}";
+        time.text = $"{min}:{s}";
     }
 
     public void PauseClick()

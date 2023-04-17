@@ -5,14 +5,17 @@ public class TimerAdder : MonoBehaviour
 {
     [SerializeField] private GameObject container;
     [SerializeField] private GameObject prefab;
-    [SerializeField] private Animator animator;
+    [SerializeField] private Animator[] animators;
     [SerializeField] private InputField timeSeconds;
     [SerializeField] private InputField timeMinuts;
     [SerializeField] private InputField title;
 
     public void OnClick()
     {
-        animator.SetTrigger("Active");
+        foreach (var animator in animators)
+        {
+            animator.SetTrigger("Active");
+        }
     }
 
     public void Create()
@@ -22,7 +25,6 @@ public class TimerAdder : MonoBehaviour
         int.TryParse(timeSeconds.text, out int s);
         int.TryParse(timeMinuts.text, out int m);
         cur.GetComponent<ItemController>().SetInterval(s + m*60, title.text);
-        Debug.Log(s + m * 60);
         OnClick();
     }
 }
