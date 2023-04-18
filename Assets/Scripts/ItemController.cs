@@ -3,14 +3,16 @@ using UnityEngine.EventSystems;
 using System.Collections;
 using UnityEngine.UI;
 
-public class ItemController : MonoBehaviour, IDragHandler
+public class ItemController : MonoBehaviour, IDragHandler, IPointerClickHandler
 {
     private Camera cam;
-    private int waitFor = 0;
+    public int waitFor = 0;
+    public int waitForConst = 0;
     private bool isPaused = false;
     private Button btn;
     [SerializeField] private Text time;
-    [SerializeField] private Text title;
+    [SerializeField] public Text title;
+    [SerializeField] private Image BG;
 
     private void Awake()
     {
@@ -25,10 +27,26 @@ public class ItemController : MonoBehaviour, IDragHandler
         ItemDeleter.ToDelete = this.gameObject;
     }
 
+    public void OnPointerClick(PointerEventData e)
+    {
+        ItemDeleter.ToDelete = this.gameObject;
+    }
+
     public void SetInterval(int interval, string ti)
     {
         this.waitFor = interval;
+        this.waitForConst = this.waitForConst > 0 ? this.waitForConst : interval;
         StartCoroutine(TickUpdate());
+        title.text = ti;
+    }
+
+    public void SetIntervalByExist(int interval, int maxIntreval, string ti)
+    {
+        this.waitFor = interval;
+        this.waitForConst = maxIntreval;
+        this.isPaused = true;
+        StartCoroutine(TickUpdate());
+        btn.GetComponentInChildren<Text>().text = "CONT";
         title.text = ti;
     }
 
@@ -47,6 +65,8 @@ public class ItemController : MonoBehaviour, IDragHandler
         {
             yield return StartCoroutine(Tick());
         }
+        GetComponent<AudioSource>().Play();
+        BG.color = Color.red;
     }
 
     private void Update()
@@ -65,8 +85,17 @@ public class ItemController : MonoBehaviour, IDragHandler
         }
         else
         {
-            btn.GetComponentInChildren<Text>().text = "CONTINUE";
+            btn.GetComponentInChildren<Text>().text = "CONT";
         }
         this.isPaused = !this.isPaused;
+    }
+
+    public void ResetTimer()
+    {
+        this.waitFor = this.waitForConst;
+        btn.GetComponentInChildren<Text>().text = "CONT";
+        this.isPaused = true;
+        GetComponent<AudioSource>().Stop();
+        BG.color = new Color(255,255,255,166);
     }
 }
