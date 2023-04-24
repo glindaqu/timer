@@ -9,14 +9,14 @@ public class FPS : MonoBehaviour
         var xmlDoc = new XmlDocument();
         try
         {
-            xmlDoc.Load(Application.persistentDataPath + "\\save.xml");
+            xmlDoc.LoadXml(PlayerPrefs.GetString("save"));
+            Application.targetFrameRate = Convert.ToInt32(xmlDoc.GetElementsByTagName("FPS")[0].InnerText);
         }
 
-        catch (Exception ex)
+        catch
         {
-            xmlDoc.LoadXml("<root> <FPS>60</FPS> <items></items> </root>");
+            Application.targetFrameRate = 60;
         }
-        Application.targetFrameRate = Convert.ToInt32(xmlDoc.GetElementsByTagName("FPS")[0].InnerText);
         FindObjectOfType<SettingsSceen>().SetPerfomance(Application.targetFrameRate);
     }
 }

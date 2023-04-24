@@ -52,7 +52,7 @@ public class ItemController : MonoBehaviour, IDragHandler, IPointerClickHandler
 
     private IEnumerator Tick()
     {
-        if (!this.isPaused )
+        if (!this.isPaused)
         {
             yield return new WaitForSeconds(1);
             this.waitFor--;
@@ -61,11 +61,14 @@ public class ItemController : MonoBehaviour, IDragHandler, IPointerClickHandler
 
     private IEnumerator TickUpdate()
     {
-        while (waitFor > 0)
+        while (this.waitFor > 0)
         {
             yield return StartCoroutine(Tick());
         }
-        GetComponent<AudioSource>().Play();
+        if (!this.isPaused)
+        {
+            GetComponent<AudioSource>().Play();
+        }
         BG.color = Color.red;
     }
 
@@ -79,7 +82,7 @@ public class ItemController : MonoBehaviour, IDragHandler, IPointerClickHandler
 
     public void PauseClick()
     {
-        if (isPaused)
+        if (this.isPaused)
         {
             btn.GetComponentInChildren<Text>().text = "STOP";
         }
@@ -87,6 +90,7 @@ public class ItemController : MonoBehaviour, IDragHandler, IPointerClickHandler
         {
             btn.GetComponentInChildren<Text>().text = "CONT";
         }
+        GetComponent<AudioSource>().Stop();
         this.isPaused = !this.isPaused;
     }
 
@@ -97,5 +101,6 @@ public class ItemController : MonoBehaviour, IDragHandler, IPointerClickHandler
         this.isPaused = true;
         GetComponent<AudioSource>().Stop();
         BG.color = new Color(255,255,255,166);
+        StartCoroutine(TickUpdate());
     }
 }

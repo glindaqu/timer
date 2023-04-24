@@ -1,44 +1,38 @@
 using System;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
-using System.IO;
 using System.Xml;
 using UnityEngine;
 
 public class XmlParser
 {
-    public static List<TimerItemModel> GetData(string xml)
+    public static List<TimerItemModel> GetData()
     {
         var res = new List<TimerItemModel>();
         var xmlDoc = new XmlDocument();
-        try
+
+        if (PlayerPrefs.HasKey("save"))
         {
-            xmlDoc.Load(xml);
+            xmlDoc.LoadXml(PlayerPrefs.GetString("save"));
         }
 
-        catch (Exception ex)
+        else
         {
-            Debug.LogException(ex);
-            FileStream fileStream = new FileStream(@xml,
-                                       FileMode.OpenOrCreate,
-                                       FileAccess.ReadWrite,
-                                       FileShare.None);
             xmlDoc.LoadXml("<root> <FPS>60</FPS> <items></items> </root>");
-            xmlDoc.Save(fileStream);
-            Resources.Load(xml);
+            PlayerPrefs.SetString("save", xmlDoc.InnerXml);
         }
 
         var items = xmlDoc.GetElementsByTagName("item");
 
         foreach ( var item in items )
         {
-            var cur = new TimerItemModel();
-
-            cur.ConstTime = Convert.ToInt32((item as XmlNode).Attributes["ConstTime"].Value);
-            cur.CurrentTime = Convert.ToInt32((item as XmlNode).Attributes["CurrentTime"].Value);
-            cur.PosX = float.Parse((item as XmlNode).Attributes["PosX"].Value);
-            cur.PosY = float.Parse((item as XmlNode).Attributes["PosY"].Value);
-            cur.Name = (item as XmlNode).Attributes["Name"].Value;
+            var cur = new TimerItemModel
+            {
+                ConstTime = Convert.ToInt32((item as XmlNode).Attributes["ConstTime"].Value),
+                CurrentTime = Convert.ToInt32((item as XmlNode).Attributes["CurrentTime"].Value),
+                PosX = float.Parse((item as XmlNode).Attributes["PosX"].Value),
+                PosY = float.Parse((item as XmlNode).Attributes["PosY"].Value),
+                Name = (item as XmlNode).Attributes["Name"].Value
+            };
 
             res.Add(cur);
         }
@@ -46,10 +40,10 @@ public class XmlParser
         return res;
     }
 
-    public static void SaveData(string xml, List<TimerItemModel> toSave)
+    public static void SaveData(List<TimerItemModel> toSave)
     {
         var xmlDoc = new XmlDocument();
-        xmlDoc.Load(xml);
+        xmlDoc.LoadXml(PlayerPrefs.GetString("save"));
 
         var root = xmlDoc.GetElementsByTagName("items")[0];
         root.RemoveAll();
@@ -65,7 +59,6 @@ public class XmlParser
         }
 
         xmlDoc.GetElementsByTagName("FPS")[0].InnerText = Application.targetFrameRate.ToString();
-
-        xmlDoc.Save(Application.persistentDataPath + "\\save.xml");
+        PlayerPrefs.SetString("save", xmlDoc.InnerXml);
     }
 }

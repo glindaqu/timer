@@ -7,7 +7,7 @@ public class StateController : MonoBehaviour
     [SerializeField] private Transform parent;
     private void Start()
     {
-        List<TimerItemModel> items = XmlParser.GetData(Application.persistentDataPath + "\\save.xml");
+        List<TimerItemModel> items = XmlParser.GetData();
 
         foreach (var item in items)
         {
@@ -34,6 +34,6 @@ public class StateController : MonoBehaviour
             items.Add(cur); 
         }
 
-        XmlParser.SaveData(Application.persistentDataPath + "\\save.xml", items);
+        XmlParser.SaveData(items);
     }
 }
